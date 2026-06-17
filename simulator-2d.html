@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunlight Simulator 2D — Solar Power Assistant</title>
+    <meta name="description" content="Free 2D sunlight simulator: see how panel direction and tilt affect solar efficiency through the day, with a performance curve.">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="assets/site.css">
+    <style>
+        body { background-color: #f8fafc; }
+        .canvas-container { position: relative; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); }
+
+        /* Mini Compass UI */
+        .mini-compass { position: absolute; top: 16px; right: 16px; width: 80px; height: 80px; background: rgba(255, 255, 255, 0.9); border: 2px solid #e2e8f0; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; z-index: 10; backdrop-filter: blur(4px); }
+        .compass-btn { position: absolute; font-size: 11px; font-weight: bold; color: #475569; cursor: pointer; transition: 0.2s; background: none; border: none; padding: 2px; }
+        .compass-btn:hover { color: #2563eb; transform: scale(1.2); }
+        #btnN { top: 2px; } #btnS { bottom: 2px; } #btnE { right: 4px; } #btnW { left: 4px; }
+        .needle-container { width: 100%; height: 100%; position: absolute; display: flex; align-items: center; justify-content: center; pointer-events: none; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .needle { width: 2px; height: 36px; background: linear-gradient(to top, #ef4444 50%, #3b82f6 50%); border-radius: 2px; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col">
+
+    <!-- Shared header -->
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a href="index.html" class="site-brand">
+                <span class="site-brand__logo">☀️</span>
+                <span class="site-brand__name">Solar Power Assistant</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Home</a>
+                <a href="calculator.html">Calculator</a>
+                <a href="simulator-2d.html" aria-current="page">2D Simulator</a>
+                <a href="simulator-3d.html">3D Simulator</a>
+                <a href="resources.html">Learn</a>
+            </nav>
+            <div class="site-header__right">
+                <div class="lang-switch">
+                    <div id="langBn" class="lang-btn active">বাংলা</div>
+                    <div id="langEn" class="lang-btn">ENG</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="p-4 md:p-8 flex-grow">
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Header -->
+        <header class="mb-8 text-center md:text-left">
+            <h1 id="mainTitle" class="text-3xl font-bold text-slate-800">সোলার প্যানেল সিমুলেটর ☀️ (Pro 2D)</h1>
+            <p id="subTitle" class="text-slate-600 mt-1">দিক ও কোণের বৈজ্ঞানিক প্রভাবে সোলার প্যানেল এফিশিয়েন্সি পরিমাপের নির্ভুল, ক্লিয়ার ২ডি সিমুলেটর।</p>
+        </header>
+
+        <!-- Main Layout Split -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Sidebar Controls -->
+            <div class="flex flex-col gap-6">
+                <!-- Collapsible Location Panel -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <button id="toggleLocBtn" class="w-full flex justify-between items-center p-5 bg-slate-50 hover:bg-slate-100 transition font-semibold text-slate-700 text-left focus:outline-none">
+                        <span class="flex items-center gap-2">📍 <span id="lblLocSet">লোকেশন সেটিংস</span> <span id="quickLocText" class="text-xs font-normal text-slate-400"></span></span>
+                        <span id="arrowIcon" class="transform transition-transform duration-200">▼</span>
+                    </button>
+                    
+                    <div id="locContent" class="hidden p-5 border-t border-slate-100 bg-white">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label id="lblLat" class="block text-xs font-medium text-slate-500 mb-1">অক্ষাংশ (Lat)</label>
+                                <input type="number" id="latInput" value="23.81" step="0.01" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-blue-500">
+                            </div>
+                            <div>
+                                <label id="lblLng" class="block text-xs font-medium text-slate-500 mb-1">দ্রাঘিমাংশ (Lng)</label>
+                                <input type="number" id="lngInput" value="90.41" step="0.01" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-blue-500">
+                            </div>
+                        </div>
+                        <button id="geoBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition flex justify-center gap-2">
+                            📡 <span id="btnGeoTxt">আমার বর্তমান লোকেশন দিন</span>
+                        </button>
+                        <p id="locStatus" class="text-[11px] text-center text-slate-400 mt-2">ডিফল্ট: ঢাকা, বাংলাদেশ</p>
+                    </div>
+                </div>
+
+                <!-- Simulation Controls -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-fit">
+                    <h2 id="lblControls" class="text-xl font-semibold text-slate-800 mb-4 border-b pb-2 border-slate-100">🎛️ কন্ট্রোল প্যানেল</h2>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2 flex justify-between">
+                            <span id="lblMonth">মাস (Month):</span>
+                            <span id="monthVal" class="font-bold text-amber-600"></span>
+                        </label>
+                        <input type="range" id="monthSlider" min="0" max="11" value="0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2 flex justify-between">
+                            <span id="lblHour">সময় (Hour):</span>
+                            <span id="hourVal" class="font-bold text-amber-600"></span>
+                        </label>
+                        <input type="range" id="hourSlider" min="6" max="18" value="12" step="0.5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2 flex justify-between">
+                            <span id="lblAzimuth">প্যানেলের দিক (Azimuth):</span>
+                            <span id="directionVal" class="font-bold text-indigo-600"></span>
+                        </label>
+                        <input type="range" id="directionSlider" min="0" max="360" value="180" step="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2 flex justify-between">
+                            <span id="lblTilt">প্যানেলের কোণ (Tilt):</span>
+                            <span id="tiltVal" class="font-bold text-blue-600"></span>
+                        </label>
+                        <input type="range" id="tiltSlider" min="0" max="90" value="23" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                    </div>
+
+                    <!-- Dynamic Feedback Message -->
+                    <div id="directionTips" class="p-4 bg-amber-50 rounded-xl border border-amber-100 text-sm text-amber-900">
+                        <p id="lblTipsHead" class="font-semibold mb-1">💡 রিয়েল-টাইম গাইড:</p>
+                        <p id="tipsText" class="text-xs leading-relaxed text-amber-800">হিসাব করা হচ্ছে...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization & Results -->
+            <div class="lg:col-span-2 flex flex-col gap-6">
+                
+                <!-- Status Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-xs text-center">
+                        <span id="lblSunAlt" class="text-xs font-semibold text-slate-400 block mb-1">সূর্যের উচ্চতা (Altitude)</span>
+                        <span id="sunAlt" class="text-2xl font-bold text-slate-800"></span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-xs text-center">
+                        <span id="lblSunInt" class="text-xs font-semibold text-slate-400 block mb-1">সূর্যালোক তীব্রতা</span>
+                        <span id="sunIntensity" class="text-2xl font-bold text-amber-500"></span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-xs text-center">
+                        <span id="lblEff" class="text-xs font-semibold text-slate-400 block mb-1">প্যানেল এফিশিয়েন্সি</span>
+                        <span id="efficiency" class="text-2xl font-bold text-emerald-600"></span>
+                    </div>
+                </div>
+
+                <!-- Pro 2D Simulator Canvas View -->
+                <div class="canvas-container p-6 flex flex-col items-center justify-center min-h-[350px]">
+                    
+                    <!-- Mini Compass Top Right -->
+                    <div class="mini-compass" title="Click to change direction">
+                        <button id="btnN" class="compass-btn">N</button>
+                        <button id="btnE" class="compass-btn">E</button>
+                        <button id="btnS" class="compass-btn">S</button>
+                        <button id="btnW" class="compass-btn">W</button>
+                        <div class="needle-container" id="compassNeedle">
+                            <div class="needle"></div>
+                        </div>
+                    </div>
+
+                    <h3 id="lblVisualizer" class="text-sm font-semibold text-slate-500 mb-4 self-start">2D Sunlight Visualizer (Side Cross-Section)</h3>
+                    
+                    <svg id="simSvg" viewBox="0 0 400 200" class="w-full max-w-[450px] h-auto">
+                        <!-- Sky Background gradient -->
+                        <defs>
+                            <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#dbeafe;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ffffff;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="400" height="180" fill="url(#skyGrad)" rx="8"/>
+
+                        <!-- Ground line -->
+                        <line x1="10" y1="180" x2="390" y2="180" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
+                        <text id="txtNorth" x="330" y="195" fill="#94a3b8" font-size="10" font-weight="bold">NORTH (উত্তর)</text>
+                        <text id="txtSouth" x="20" y="195" fill="#94a3b8" font-size="10" font-weight="bold">SOUTH (দক্ষিণ)</text>
+
+                        <!-- Solar Panel Group -->
+                        <g id="solarPanelGroup">
+                            <line x1="200" y1="180" x2="200" y2="130" stroke="#64748b" stroke-width="6" />
+                            <!-- Main Panel -->
+                            <line id="panelLine" x1="170" y1="110" x2="230" y2="150" stroke="#1e40af" stroke-width="8" stroke-linecap="round"/>
+                            <line id="panelGrid" x1="175" y1="113" x2="225" y2="147" stroke="#60a5fa" stroke-width="2" stroke-dasharray="4,2"/>
+                        </g>
+
+                        <!-- Sun Ray Paths -->
+                        <line id="sunRay" x1="50" y1="50" x2="200" y2="130" stroke="#fbbf24" stroke-width="3" stroke-dasharray="5,5" />
+
+                        <!-- Sun Indicator -->
+                        <circle id="sunCircle" cx="50" cy="50" r="16" fill="#f59e0b" filter="drop-shadow(0px 0px 8px rgba(245, 158, 11, 0.7))"/>
+                        <circle cx="50" cy="50" r="10" fill="#fffbeb" id="sunInnerCircle"/>
+                    </svg>
+                </div>
+
+                <!-- Daily Performance Graph -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 id="lblChartHead" class="text-lg font-semibold text-slate-800 mb-4">সারাদিনের প্যানেল পারফরম্যান্স কার্ভ</h3>
+                    <div class="h-[200px] w-full">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    </main>
+
+    <!-- Shared footer -->
+    <footer class="site-footer">
+        <div class="site-footer__links">
+            <a href="https://tools.sukkarshop.com/" target="_blank" rel="noopener">🛠️ Tools</a>
+            <span class="site-footer__sep">|</span>
+            <a href="https://sukkarshop.com" target="_blank" rel="noopener">🏠 Homepage</a>
+        </div>
+        <p class="site-footer__meta">
+            <strong>Solar Power Assistant</strong> · Powered by
+            <a href="https://sukkarshop.com" target="_blank" rel="noopener">sukkarshop.com</a>
+        </p>
+        <p class="site-footer__note">All tools run entirely in your browser — no data is collected.</p>
+    </footer>
+
+    <script>
+        // ---- Internationalization (i18n) ----
+        let lang = 'bn';
+        const dict = {
+            bn: {
+                mainTitle: "সোলার প্যানেল সিমুলেটর ☀️ (Pro 2D)",
+                subTitle: "দিক ও কোণের বৈজ্ঞানিক প্রভাবে সোলার প্যানেল এফিশিয়েন্সি পরিমাপের নির্ভুল, ক্লিয়ার ২ডি সিমুলেটর।",
+                lblLocSet: "লোকেশন সেটিংস", lblLat: "অক্ষাংশ (Lat)", lblLng: "দ্রাঘিমাংশ (Lng)",
+                btnGeoTxt: "আমার বর্তমান লোকেশন দিন", locStatDef: "ডিফল্ট: ঢাকা, বাংলাদেশ",
+                lblControls: "🎛️ কন্ট্রোল প্যানেল", lblMonth: "মাস (Month):", lblHour: "সময় (Hour):",
+                lblAzimuth: "প্যানেলের দিক (Azimuth):", lblTilt: "প্যানেলের কোণ (Tilt):",
+                lblTipsHead: "💡 রিয়েল-টাইম গাইড:", lblSunAlt: "সূর্যের উচ্চতা (Altitude)",
+                lblSunInt: "সূর্যালোক তীব্রতা", lblEff: "প্যানেল এফিশিয়েন্সি", 
+                lblChartHead: "সারাদিনের প্যানেল পারফরম্যান্স কার্ভ", lblVisualizer: "2D Sunlight Visualizer (Side Cross-Section)",
+                txtSouth: "SOUTH (দক্ষিণ)", txtNorth: "NORTH (উত্তর)",
+                months: ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"],
+                dirs: ["উত্তর", "উত্তর-পূর্ব", "পূর্ব", "দক্ষিণ-পূর্ব", "দক্ষিণ", "দক্ষিণ-পশ্চিম", "পশ্চিম", "উত্তর-পশ্চিম"],
+                warnErr: "⚠️ প্যানেলের মুখ ভুল দিকে ঘোরানো! সর্বোচ্চ সূর্যালোক পেতে প্যানেলটিকে",
+                warnOk: "✅ পজিশন ঠিক আছে। প্যানেলটি বৈজ্ঞানিক হিসাব অনুযায়ী আইডিয়াল ডিরেকশনের কাছাকাছি আছে।",
+                southWord: "দক্ষিণমুখী (১৮০°)", northWord: "উত্তরমুখী (০°)", doMake: "করুন।"
+            },
+            en: {
+                mainTitle: "Solar Panel Simulator ☀️ (Pro 2D)",
+                subTitle: "Accurate, clear 2D simulator for solar panel efficiency based on scientific direction & tilt calculations.",
+                lblLocSet: "Location Settings", lblLat: "Latitude (Lat)", lblLng: "Longitude (Lng)",
+                btnGeoTxt: "Use My Current Location", locStatDef: "Default: Dhaka, Bangladesh",
+                lblControls: "🎛️ Control Panel", lblMonth: "Month:", lblHour: "Time (Hour):",
+                lblAzimuth: "Panel Direction (Azimuth):", lblTilt: "Panel Angle (Tilt):",
+                lblTipsHead: "💡 Real-time Guide:", lblSunAlt: "Sun Altitude",
+                lblSunInt: "Sunlight Intensity", lblEff: "Panel Efficiency", 
+                lblChartHead: "Daily Panel Performance Curve", lblVisualizer: "2D Sunlight Visualizer (Side Cross-Section)",
+                txtSouth: "SOUTH", txtNorth: "NORTH",
+                months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                dirs: ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"],
+                warnErr: "⚠️ Panel is facing the wrong way! For maximum sunlight, turn it",
+                warnOk: "✅ Position is good. The panel is near the scientifically ideal direction.",
+                southWord: "South (180°)", northWord: "North (0°)", doMake: "."
+            }
+        };
+
+        const t = (key) => dict[lang][key];
+        const el = (id) => document.getElementById(id);
+
+        const els = {
+            mainTitle: el('mainTitle'), subTitle: el('subTitle'), lblLocSet: el('lblLocSet'),
+            lblLat: el('lblLat'), lblLng: el('lblLng'), btnGeoTxt: el('btnGeoTxt'),
+            locStatus: el('locStatus'), lblControls: el('lblControls'), lblMonth: el('lblMonth'),
+            lblHour: el('lblHour'), lblAzimuth: el('lblAzimuth'), lblTilt: el('lblTilt'),
+            lblTipsHead: el('lblTipsHead'), lblSunAlt: el('lblSunAlt'), lblSunInt: el('lblSunInt'),
+            lblEff: el('lblEff'), lblChartHead: el('lblChartHead'), lblVisualizer: el('lblVisualizer'),
+            tipsText: el('tipsText'), directionTips: el('directionTips'),
+            txtSouth: el('txtSouth'), txtNorth: el('txtNorth')
+        };
+
+        const inputs = {
+            lat: el('latInput'), lng: el('lngInput'), month: el('monthSlider'),
+            hour: el('hourSlider'), dir: el('directionSlider'), tilt: el('tiltSlider')
+        };
+        const vals = { month: el('monthVal'), hour: el('hourVal'), dir: el('directionVal'), tilt: el('tiltVal') };
+        const stats = { alt: el('sunAlt'), int: el('sunIntensity'), eff: el('efficiency') };
+        const svgEls = { line: el('panelLine'), grid: el('panelGrid'), ray: el('sunRay'), circle: el('sunCircle'), inner: el('sunInnerCircle'), needle: el('compassNeedle') };
+
+        // Language Switch Logic
+        el('langBn').onclick = () => setLang('bn');
+        el('langEn').onclick = () => setLang('en');
+
+        function setLang(l) {
+            lang = l;
+            el('langBn').className = `lang-btn ${l === 'bn' ? 'active' : ''}`;
+            el('langEn').className = `lang-btn ${l === 'en' ? 'active' : ''}`;
+            for (const key in els) { if(dict[lang][key]) els[key].innerText = dict[lang][key]; }
+            if(performanceChart) performanceChart.data.datasets[0].label = l === 'bn' ? 'আউটপুট (%)' : 'Output (%)';
+            document.documentElement.lang = l === 'bn' ? 'bn' : 'en';
+            localStorage.setItem('solarHubLang', l);
+            updateSimulation();
+        }
+
+        // Collapsible Location
+        el('toggleLocBtn').onclick = () => {
+            const isHidden = el('locContent').classList.toggle('hidden');
+            el('arrowIcon').style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+        };
+
+        // Mini Compass Listeners
+        el('btnN').onclick = () => { inputs.dir.value = 0; updateSimulation(); };
+        el('btnE').onclick = () => { inputs.dir.value = 90; updateSimulation(); };
+        el('btnS').onclick = () => { inputs.dir.value = 180; updateSimulation(); };
+        el('btnW').onclick = () => { inputs.dir.value = 270; updateSimulation(); };
+
+        // Initialize Chart
+        const ctxChart = el('performanceChart').getContext('2d');
+        let performanceChart = new Chart(ctxChart, {
+            type: 'line',
+            data: { labels: ['6 AM', '8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM'], datasets: [{ label: 'আউটপুট (%)', data: [0,0,0,0,0,0,0], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 3, fill: true, tension: 0.4 }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } }, plugins: { legend: { display: false } } }
+        });
+
+        // --- Core Scientific Math ---
+        function getSolarCalculations(lat, month, hour, panTilt, panAzimuth) {
+            const dayOfYear = (month * 30.5) + 15;
+            const declination = 23.45 * Math.sin((360 / 365) * (dayOfYear + 284) * Math.PI / 180);
+            const hourAngle = (hour - 12) * 15;
+            const latRad = lat * Math.PI / 180;
+            const decRad = declination * Math.PI / 180;
+            const hrRad = hourAngle * Math.PI / 180;
+            
+            const sinAlt = Math.sin(latRad) * Math.sin(decRad) + Math.cos(latRad) * Math.cos(decRad) * Math.cos(hrRad);
+            let altRad = Math.asin(sinAlt);
+            let altDeg = altRad * 180 / Math.PI;
+            if (altDeg < 0) altDeg = 0;
+
+            let cosSunAzimuth = (Math.sin(decRad) - Math.sin(altRad) * Math.sin(latRad)) / (Math.cos(altRad) * Math.cos(latRad));
+            cosSunAzimuth = Math.max(-1, Math.min(1, cosSunAzimuth)); 
+            let sunAzimuthDeg = Math.acos(cosSunAzimuth) * 180 / Math.PI;
+            if (hourAngle > 0) sunAzimuthDeg = 360 - sunAzimuthDeg; 
+
+            const tiltRad = panTilt * Math.PI / 180;
+            const azRad = panAzimuth * Math.PI / 180;
+
+            const cosAOI = Math.sin(altRad) * Math.cos(tiltRad) + Math.cos(altRad) * Math.sin(tiltRad) * Math.cos((sunAzimuthDeg - panAzimuth) * Math.PI / 180);
+            let efficiency = cosAOI > 0 && altDeg > 0 ? cosAOI * Math.sin(altRad) * 100 : 0;
+
+            return {
+                altitude: altDeg, sunAzimuth: sunAzimuthDeg,
+                intensity: Math.sin(altRad) * 100 > 0 ? Math.sin(altRad) * 100 : 0,
+                efficiency: Math.max(0, Math.round(efficiency))
+            };
+        }
+
+        function getDirectionName(deg) {
+            const d = t('dirs');
+            if (deg >= 338 || deg < 23) return d[0]; if (deg >= 23 && deg < 68) return d[1];
+            if (deg >= 68 && deg < 113) return d[2]; if (deg >= 113 && deg < 158) return d[3];
+            if (deg >= 158 && deg < 203) return d[4]; if (deg >= 203 && deg < 248) return d[5];
+            if (deg >= 248 && deg < 293) return d[6]; return d[7];
+        }
+
+        function formatHour(h) {
+            const m = h % 1 === 0 ? '00' : '30';
+            const hrInt = Math.floor(h);
+            const ampm = hrInt >= 12 ? 'PM' : 'AM';
+            const dispHr = hrInt > 12 ? hrInt - 12 : (hrInt === 0 ? 12 : hrInt);
+            return `${dispHr}:${m} ${ampm}`;
+        }
+
+        function updateSimulation() {
+            const lat = parseFloat(inputs.lat.value) || 0;
+            el('quickLocText').innerText = `(${lat > 0 ? lat + '° N' : Math.abs(lat) + '° S'})`;
+
+            const mIdx = parseInt(inputs.month.value);
+            const hr = parseFloat(inputs.hour.value);
+            const azimuth = parseInt(inputs.dir.value);
+            const tilt = parseInt(inputs.tilt.value);
+
+            vals.month.innerText = t('months')[mIdx];
+            vals.hour.innerText = formatHour(hr);
+            vals.dir.innerText = `${getDirectionName(azimuth)} (${azimuth}°)`;
+            vals.tilt.innerText = `${tilt}°`;
+
+            const metrics = getSolarCalculations(lat, mIdx, hr, tilt, azimuth);
+            
+            stats.alt.innerText = `${metrics.altitude.toFixed(1)}°`;
+            stats.int.innerText = `${Math.round(metrics.intensity)}%`;
+            stats.eff.innerText = `${metrics.efficiency}%`;
+
+            // UI Tips
+            const targetAzimuth = lat >= 0 ? 180 : 0;
+            const azError = Math.abs(azimuth - targetAzimuth);
+
+            if (azError > 60) {
+                els.tipsText.innerHTML = `${t('warnErr')} <strong>${lat >= 0 ? t('southWord') : t('northWord')}</strong> ${t('doMake')}`;
+                els.directionTips.className = "p-4 bg-red-50 rounded-xl border border-red-100 text-sm text-red-950";
+            } else {
+                els.tipsText.innerHTML = t('warnOk');
+                els.directionTips.className = "p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-sm text-emerald-950";
+            }
+
+            // Compass Needle Rotation
+            svgEls.needle.style.transform = `rotate(${azimuth}deg)`;
+
+            // --- PRO 2D VISUAL DYNAMICS ---
+            const panelLength = 70;
+            const cx = 200, cy = 130;
+
+            // Foreshortening calculation: if panel faces East/West, it looks shorter in Side View
+            let projectionFactor = Math.cos((azimuth - 180) * Math.PI / 180); 
+            // Scale X based on projection to simulate turning. Ensures it doesn't flip weirdly on pure East/West
+            let effectiveTiltRad = tilt * Math.PI / 180;
+            
+            let xOffset = (panelLength / 2) * Math.cos(effectiveTiltRad) * projectionFactor;
+            let yOffset = (panelLength / 2) * Math.sin(effectiveTiltRad);
+            // If facing East (projection ~0), the panel line becomes completely vertical, acting like a side edge
+
+            const x1 = cx - xOffset; const y1 = cy + yOffset;
+            const x2 = cx + xOffset; const y2 = cy - yOffset;
+
+            svgEls.line.setAttribute('x1', x1); svgEls.line.setAttribute('y1', y1);
+            svgEls.line.setAttribute('x2', x2); svgEls.line.setAttribute('y2', y2);
+            svgEls.grid.setAttribute('x1', x1 + 2 * projectionFactor); svgEls.grid.setAttribute('y1', y1 - 2);
+            svgEls.grid.setAttribute('x2', x2 - 2 * projectionFactor); svgEls.grid.setAttribute('y2', y2 + 2);
+
+            // Sun Movement
+            if (metrics.altitude > 0) {
+                svgEls.circle.style.display = 'block'; svgEls.inner.style.display = 'block'; svgEls.ray.style.display = 'block';
+                const sunRad = metrics.altitude * Math.PI / 180;
+                
+                // Position relative to azimuth matching (Visually simplified to South/Left hemisphere)
+                const sunX = cx - 140 * Math.cos(sunRad);
+                const sunY = cy - 140 * Math.sin(sunRad);
+
+                svgEls.circle.setAttribute('cx', sunX); svgEls.circle.setAttribute('cy', sunY);
+                svgEls.inner.setAttribute('cx', sunX); svgEls.inner.setAttribute('cy', sunY);
+                svgEls.ray.setAttribute('x1', sunX); svgEls.ray.setAttribute('y1', sunY);
+            } else {
+                svgEls.circle.style.display = 'none'; svgEls.inner.style.display = 'none'; svgEls.ray.style.display = 'none';
+            }
+
+            // Day Chart Update
+            const hoursCheck = [6, 8, 10, 12, 14, 16, 18];
+            performanceChart.data.datasets[0].data = hoursCheck.map(h => getSolarCalculations(lat, mIdx, h, tilt, azimuth).efficiency);
+            performanceChart.update();
+        }
+
+        // Location Detection
+        el('geoBtn').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                els.locStatus.innerText = lang === 'bn' ? "🌐 লোকেশন খোঁজা হচ্ছে..." : "🌐 Locating...";
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        inputs.lat.value = pos.coords.latitude.toFixed(2);
+                        inputs.lng.value = pos.coords.longitude.toFixed(2);
+                        els.locStatus.innerText = `✅ ${lang === 'bn' ? 'লোড হয়েছে' : 'Loaded'}: ${pos.coords.latitude.toFixed(2)}°, ${pos.coords.longitude.toFixed(2)}°`;
+                        inputs.tilt.value = Math.round(Math.abs(pos.coords.latitude));
+                        inputs.dir.value = pos.coords.latitude >= 0 ? 180 : 0;
+                        updateSimulation();
+                    },
+                    () => { els.locStatus.innerText = lang === 'bn' ? "❌ লোকেশন পাওয়া যায়নি!" : "❌ Failed! Enter manually."; }
+                );
+            }
+        });
+
+        // Event Listeners
+        Object.values(inputs).forEach(input => input.addEventListener('input', updateSimulation));
+
+        // Init
+        setLang(localStorage.getItem('solarHubLang') || 'bn');
+    </script>
+</body>
+</html>

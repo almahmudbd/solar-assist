@@ -1,0 +1,58 @@
+/* Solar Power Assistant — shared site chrome (header, footer, language switch) */
+
+:root {
+  --sa-primary: #2563eb;
+  --sa-ink: #1e293b;
+  --sa-muted: #64748b;
+  --sa-border: #e2e8f0;
+}
+
+body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+
+/* ── Language switch ── */
+.lang-switch { position: relative; display: inline-flex; background: #e2e8f0; border-radius: 99px; padding: 2px; }
+.lang-btn { padding: 4px 14px; font-size: 14px; font-weight: 600; border-radius: 99px; cursor: pointer; transition: 0.3s; color: #64748b; }
+.lang-btn.active { background: #ffffff; color: var(--sa-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+/* ── Site header ── */
+.site-header {
+  position: sticky; top: 0; z-index: 40;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--sa-border);
+}
+.site-header__inner {
+  max-width: 72rem; margin: 0 auto;
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.7rem 1rem;
+}
+.site-brand { display: inline-flex; align-items: center; gap: 0.55rem; text-decoration: none; }
+.site-brand__logo {
+  width: 34px; height: 34px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  font-size: 18px; box-shadow: 0 2px 6px rgba(245,158,11,0.35);
+}
+.site-brand__name { font-weight: 700; color: var(--sa-ink); font-size: 15px; letter-spacing: -0.01em; }
+.site-nav { display: none; gap: 1.1rem; margin-left: 0.5rem; }
+.site-nav a { font-size: 14px; font-weight: 500; color: var(--sa-muted); text-decoration: none; transition: color 0.2s; }
+.site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--sa-primary); }
+.site-header__right { margin-left: auto; display: inline-flex; align-items: center; gap: 0.75rem; }
+@media (min-width: 768px) { .site-nav { display: inline-flex; } }
+
+/* ── Site footer ── */
+.site-footer {
+  border-top: 1px solid var(--sa-border);
+  margin-top: 3.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--sa-muted);
+}
+.site-footer__links { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; font-size: 14px; }
+.site-footer__links a { color: var(--sa-muted); text-decoration: none; transition: color 0.2s; }
+.site-footer__links a:hover { color: var(--sa-primary); }
+.site-footer__sep { color: #cbd5e1; }
+.site-footer__meta { font-size: 12px; margin-top: 0.6rem; }
+.site-footer__meta a { color: var(--sa-muted); }
+.site-footer__meta a:hover { color: var(--sa-primary); }
+.site-footer__note { font-size: 11px; margin-top: 0.4rem; color: #94a3b8; }

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Power Assistant — Free Solar Tools</title>
+    <meta name="description" content="Free solar power tools: home system-size calculator plus 2D and 3D sunlight simulators for solar PV panels. Runs entirely in your browser.">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+    <!-- Open Graph / social -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Solar Power Assistant — Free Solar Tools">
+    <meta property="og:description" content="System-size calculator and 2D/3D sunlight simulators for solar panels. No signup, runs in your browser.">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/site.css">
+    <style>
+        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-sky-50 to-slate-100 min-h-screen flex flex-col">
+
+    <!-- Shared header -->
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a href="index.html" class="site-brand">
+                <span class="site-brand__logo">☀️</span>
+                <span class="site-brand__name">Solar Power Assistant</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html" aria-current="page">Home</a>
+                <a href="calculator.html">Calculator</a>
+                <a href="simulator-2d.html">2D Simulator</a>
+                <a href="simulator-3d.html">3D Simulator</a>
+                <a href="resources.html">Learn</a>
+            </nav>
+            <div class="site-header__right">
+                <div class="lang-switch">
+                    <div id="langBn" class="lang-btn active">বাংলা</div>
+                    <div id="langEn" class="lang-btn">ENG</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl w-full mx-auto px-4 py-10 md:py-16 flex-grow">
+
+        <!-- Hero -->
+        <div class="text-center mb-12">
+            <div class="text-6xl mb-4">☀️</div>
+            <h1 id="mainTitle" class="text-3xl md:text-4xl font-bold text-slate-800">সোলার পাওয়ার অ্যাসিস্ট্যান্ট</h1>
+            <p id="subTitle" class="text-slate-500 mt-3 max-w-xl mx-auto">আপনার সোলার সিস্টেম পরিকল্পনার জন্য ৩টি ফ্রি টুল — সিস্টেম সাইজ ক্যালকুলেটর ও সূর্যালোক সিমুলেটর।</p>
+        </div>
+
+        <!-- Tool cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <a href="calculator.html" class="card-hover bg-white rounded-2xl border border-slate-200 shadow-sm p-7 flex flex-col">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center text-3xl mb-5">🔋</div>
+                <h2 id="t1Title" class="text-lg font-bold text-slate-800">সোলার পাওয়ার ক্যালকুলেটর</h2>
+                <p id="t1Desc" class="text-sm text-slate-500 mt-2 flex-grow">বাড়ির লোড অনুযায়ী প্রয়োজনীয় প্যানেল, ইনভার্টার ও ব্যাটারির নিখুঁত হিসাব করুন।</p>
+                <span id="t1Open" class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-emerald-600">টুল খুলুন →</span>
+            </a>
+
+            <a href="simulator-2d.html" class="card-hover bg-white rounded-2xl border border-slate-200 shadow-sm p-7 flex flex-col">
+                <div class="w-14 h-14 rounded-2xl bg-amber-100 flex items-center justify-center text-3xl mb-5">📊</div>
+                <h2 id="t2Title" class="text-lg font-bold text-slate-800">সানলাইট সিমুলেটর (2D)</h2>
+                <p id="t2Desc" class="text-sm text-slate-500 mt-2 flex-grow">দিক ও কোণ অনুযায়ী প্যানেল এফিশিয়েন্সির বৈজ্ঞানিক ২ডি সিমুলেশন ও পারফরম্যান্স কার্ভ।</p>
+                <span id="t2Open" class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-amber-600">টুল খুলুন →</span>
+            </a>
+
+            <a href="simulator-3d.html" class="card-hover bg-white rounded-2xl border border-slate-200 shadow-sm p-7 flex flex-col">
+                <div class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-3xl mb-5">🧊</div>
+                <h2 id="t3Title" class="text-lg font-bold text-slate-800">সানলাইট সিমুলেটর (3D)</h2>
+                <p id="t3Desc" class="text-sm text-slate-500 mt-2 flex-grow">কম্পাস ও সাইড ভিউতে প্যানেলের ত্রিমাত্রিক ওরিয়েন্টেশন ও সূর্যের অবস্থান দেখুন।</p>
+                <span id="t3Open" class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-blue-600">টুল খুলুন →</span>
+            </a>
+
+            <a href="resources.html" class="card-hover bg-white rounded-2xl border border-slate-200 shadow-sm p-7 flex flex-col">
+                <div class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center text-3xl mb-5">📚</div>
+                <h2 id="t4Title" class="text-lg font-bold text-slate-800">সোলার শিখুন</h2>
+                <p id="t4Desc" class="text-sm text-slate-500 mt-2 flex-grow">সোলার প্যানেল নিয়ে আর্টিকেল, ভিডিও গাইড ও সহায়ক ডায়াগ্রাম এক জায়গায়।</p>
+                <span id="t4Open" class="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-purple-600">দেখুন →</span>
+            </a>
+
+        </div>
+    </main>
+
+    <!-- Shared footer -->
+    <footer class="site-footer">
+        <div class="site-footer__links">
+            <a href="https://tools.sukkarshop.com/" target="_blank" rel="noopener">🛠️ Tools</a>
+            <span class="site-footer__sep">|</span>
+            <a href="https://sukkarshop.com" target="_blank" rel="noopener">🏠 Homepage</a>
+        </div>
+        <p class="site-footer__meta">
+            <strong>Solar Power Assistant</strong> · Powered by
+            <a href="https://sukkarshop.com" target="_blank" rel="noopener">sukkarshop.com</a>
+        </p>
+        <p id="footerText" class="site-footer__note">সব টুল আপনার ব্রাউজারেই চলে — কোনো ডেটা সংগ্রহ করা হয় না।</p>
+    </footer>
+
+    <script>
+        const dict = {
+            bn: {
+                mainTitle: "সোলার পাওয়ার অ্যাসিস্ট্যান্ট",
+                subTitle: "আপনার সোলার সিস্টেম পরিকল্পনার জন্য ৩টি ফ্রি টুল — সিস্টেম সাইজ ক্যালকুলেটর ও সূর্যালোক সিমুলেটর।",
+                t1Title: "সোলার পাওয়ার ক্যালকুলেটর",
+                t1Desc: "বাড়ির লোড অনুযায়ী প্রয়োজনীয় প্যানেল, ইনভার্টার ও ব্যাটারির নিখুঁত হিসাব করুন।",
+                t2Title: "সানলাইট সিমুলেটর (2D)",
+                t2Desc: "দিক ও কোণ অনুযায়ী প্যানেল এফিশিয়েন্সির বৈজ্ঞানিক ২ডি সিমুলেশন ও পারফরম্যান্স কার্ভ।",
+                t3Title: "সানলাইট সিমুলেটর (3D)",
+                t3Desc: "কম্পাস ও সাইড ভিউতে প্যানেলের ত্রিমাত্রিক ওরিয়েন্টেশন ও সূর্যের অবস্থান দেখুন।",
+                t4Title: "সোলার শিখুন",
+                t4Desc: "সোলার প্যানেল নিয়ে আর্টিকেল, ভিডিও গাইড ও সহায়ক ডায়াগ্রাম এক জায়গায়।",
+                t4Open: "দেখুন →",
+                open: "টুল খুলুন →",
+                footerText: "সব টুল আপনার ব্রাউজারেই চলে — কোনো ডেটা সংগ্রহ করা হয় না।"
+            },
+            en: {
+                mainTitle: "Solar Power Assistant",
+                subTitle: "Three free tools to plan your solar setup — system size calculator and sunlight simulators.",
+                t1Title: "Solar Power Calculator",
+                t1Desc: "Calculate the exact panels, inverter, and battery your home load requires.",
+                t2Title: "Sunlight Simulator (2D)",
+                t2Desc: "Scientific 2D simulation of panel efficiency by direction & tilt, with a performance curve.",
+                t3Title: "Sunlight Simulator (3D)",
+                t3Desc: "View the panel's 3D orientation and the sun's position in compass and side views.",
+                t4Title: "Learn Solar",
+                t4Desc: "Solar panel articles, video guides, and helpful diagrams — all in one place.",
+                t4Open: "Explore →",
+                open: "Open tool →",
+                footerText: "All tools run entirely in your browser — no data is collected."
+            }
+        };
+
+        const el = (id) => document.getElementById(id);
+        function setLang(l) {
+            el('langBn').className = `lang-btn ${l === 'bn' ? 'active' : ''}`;
+            el('langEn').className = `lang-btn ${l === 'en' ? 'active' : ''}`;
+            const d = dict[l];
+            el('mainTitle').innerText = d.mainTitle;
+            el('subTitle').innerText = d.subTitle;
+            el('t1Title').innerText = d.t1Title; el('t1Desc').innerText = d.t1Desc; el('t1Open').innerText = d.open;
+            el('t2Title').innerText = d.t2Title; el('t2Desc').innerText = d.t2Desc; el('t2Open').innerText = d.open;
+            el('t3Title').innerText = d.t3Title; el('t3Desc').innerText = d.t3Desc; el('t3Open').innerText = d.open;
+            el('t4Title').innerText = d.t4Title; el('t4Desc').innerText = d.t4Desc; el('t4Open').innerText = d.t4Open;
+            el('footerText').innerText = d.footerText;
+            document.documentElement.lang = l === 'bn' ? 'bn' : 'en';
+            localStorage.setItem('solarHubLang', l);
+        }
+        el('langBn').onclick = () => setLang('bn');
+        el('langEn').onclick = () => setLang('en');
+        setLang(localStorage.getItem('solarHubLang') || 'bn');
+    </script>
+</body>
+</html>

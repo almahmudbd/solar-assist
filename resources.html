@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Solar — Solar Power Assistant</title>
+    <meta name="description" content="Curated solar panel articles, video guides, and helpful diagrams to learn how solar PV systems, tilt, and wiring work.">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/site.css">
+    <style>
+        body { background-color: #f8fafc; }
+        .res-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .res-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px -8px rgb(0 0 0 / 0.12); }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col">
+
+    <!-- Shared header -->
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a href="index.html" class="site-brand">
+                <span class="site-brand__logo">☀️</span>
+                <span class="site-brand__name">Solar Power Assistant</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Home</a>
+                <a href="calculator.html">Calculator</a>
+                <a href="simulator-2d.html">2D Simulator</a>
+                <a href="simulator-3d.html">3D Simulator</a>
+                <a href="resources.html" aria-current="page">Learn</a>
+            </nav>
+            <div class="site-header__right">
+                <div class="lang-switch">
+                    <div id="langBn" class="lang-btn active">বাংলা</div>
+                    <div id="langEn" class="lang-btn">ENG</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl w-full mx-auto px-4 py-10 md:py-14 flex-grow">
+
+        <!-- Hero -->
+        <div class="mb-10 text-center md:text-left">
+            <h1 id="mainTitle" class="text-3xl md:text-4xl font-bold text-slate-800">সোলার শিখুন ☀️</h1>
+            <p id="subTitle" class="text-slate-500 mt-2 max-w-2xl">সোলার প্যানেল, সিস্টেম ডিজাইন ও ইনস্টলেশন বোঝার জন্য বাছাই করা আর্টিকেল, ভিডিও গাইড ও সহায়ক ডায়াগ্রাম।</p>
+        </div>
+
+        <!-- Articles -->
+        <section class="mb-12">
+            <h2 id="lblArticles" class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">📚 আর্টিকেল ও গাইড</h2>
+            <div id="articleGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- Videos -->
+        <section class="mb-12">
+            <h2 id="lblVideos" class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">🎬 ভিডিও গাইড</h2>
+            <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </section>
+
+        <!-- Diagrams / helpful images -->
+        <section class="mb-4">
+            <h2 id="lblDiagrams" class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">🖼️ সহায়ক ডায়াগ্রাম</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Diagram 1: Panel tilt toward sun -->
+                <figure class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                    <svg viewBox="0 0 240 160" class="w-full h-auto" role="img" aria-label="Panel tilt toward the sun">
+                        <rect width="240" height="160" rx="10" fill="#f8fafc"/>
+                        <line x1="20" y1="135" x2="220" y2="135" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="55" cy="42" r="16" fill="#f59e0b"/>
+                        <g stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round">
+                            <line x1="55" y1="14" x2="55" y2="22"/><line x1="55" y1="62" x2="55" y2="70"/>
+                            <line x1="27" y1="42" x2="35" y2="42"/><line x1="75" y1="42" x2="83" y2="42"/>
+                            <line x1="35" y1="22" x2="41" y2="28"/><line x1="69" y1="56" x2="75" y2="62"/>
+                        </g>
+                        <line x1="95" y1="72" x2="150" y2="110" stroke="#fbbf24" stroke-width="2" stroke-dasharray="5,4"/>
+                        <line x1="150" y1="135" x2="150" y2="105" stroke="#64748b" stroke-width="4"/>
+                        <line x1="125" y1="92" x2="178" y2="118" stroke="#1e40af" stroke-width="7" stroke-linecap="round"/>
+                        <path d="M 178 118 A 30 30 0 0 0 180 135" fill="none" stroke="#10b981" stroke-width="2"/>
+                        <text x="186" y="130" fill="#10b981" font-size="11" font-weight="bold">tilt</text>
+                    </svg>
+                    <figcaption id="dia1" class="text-xs text-slate-500 mt-3 leading-relaxed">প্যানেলের কোণ (tilt) সাধারণত আপনার অক্ষাংশের সমান রাখলে সারা বছর গড়ে সবচেয়ে বেশি সূর্যালোক পাওয়া যায়।</figcaption>
+                </figure>
+
+                <!-- Diagram 2: Off-grid system flow -->
+                <figure class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                    <svg viewBox="0 0 240 160" class="w-full h-auto" role="img" aria-label="Off-grid system components">
+                        <rect width="240" height="160" rx="10" fill="#f8fafc"/>
+                        <g font-size="9" font-weight="bold" text-anchor="middle">
+                            <rect x="14" y="30" width="46" height="30" rx="5" fill="#dbeafe" stroke="#3b82f6"/>
+                            <text x="37" y="48" fill="#1e40af">Panel</text>
+                            <rect x="80" y="30" width="46" height="30" rx="5" fill="#dcfce7" stroke="#16a34a"/>
+                            <text x="103" y="44" fill="#15803d">Charge</text><text x="103" y="54" fill="#15803d">Ctrl</text>
+                            <rect x="146" y="30" width="46" height="30" rx="5" fill="#fef9c3" stroke="#ca8a04"/>
+                            <text x="169" y="48" fill="#a16207">Battery</text>
+                            <rect x="80" y="100" width="46" height="30" rx="5" fill="#ede9fe" stroke="#7c3aed"/>
+                            <text x="103" y="118" fill="#6d28d9">Inverter</text>
+                            <rect x="146" y="100" width="46" height="30" rx="5" fill="#fee2e2" stroke="#dc2626"/>
+                            <text x="169" y="118" fill="#b91c1c">Load</text>
+                        </g>
+                        <g stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arr)">
+                            <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+                            <line x1="60" y1="45" x2="78" y2="45"/>
+                            <line x1="126" y1="45" x2="144" y2="45"/>
+                            <line x1="169" y1="62" x2="169" y2="80" stroke-dasharray="0"/>
+                            <path d="M 169 80 L 169 90 L 103 90 L 103 98"/>
+                            <line x1="126" y1="115" x2="144" y2="115"/>
+                        </g>
+                    </svg>
+                    <figcaption id="dia2" class="text-xs text-slate-500 mt-3 leading-relaxed">অফ-গ্রিড সিস্টেমের প্রবাহ: প্যানেল → চার্জ কন্ট্রোলার → ব্যাটারি → ইনভার্টার → লোড (যন্ত্রপাতি)।</figcaption>
+                </figure>
+
+                <!-- Diagram 3: Series vs parallel -->
+                <figure class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                    <svg viewBox="0 0 240 160" class="w-full h-auto" role="img" aria-label="Series versus parallel wiring">
+                        <rect width="240" height="160" rx="10" fill="#f8fafc"/>
+                        <text x="60" y="22" fill="#475569" font-size="10" font-weight="bold" text-anchor="middle">Series (V↑)</text>
+                        <g fill="#dbeafe" stroke="#3b82f6" stroke-width="2">
+                            <rect x="35" y="34" width="22" height="34" rx="3"/>
+                            <rect x="65" y="34" width="22" height="34" rx="3"/>
+                        </g>
+                        <line x1="57" y1="51" x2="65" y2="51" stroke="#334155" stroke-width="2"/>
+                        <line x1="20" y1="51" x2="35" y2="51" stroke="#ef4444" stroke-width="2"/>
+                        <line x1="87" y1="51" x2="102" y2="51" stroke="#334155" stroke-width="2"/>
+                        <text x="180" y="22" fill="#475569" font-size="10" font-weight="bold" text-anchor="middle">Parallel (A↑)</text>
+                        <g fill="#dcfce7" stroke="#16a34a" stroke-width="2">
+                            <rect x="150" y="30" width="22" height="30" rx="3"/>
+                            <rect x="150" y="74" width="22" height="30" rx="3"/>
+                        </g>
+                        <line x1="172" y1="45" x2="200" y2="45" stroke="#ef4444" stroke-width="2"/>
+                        <line x1="172" y1="89" x2="200" y2="89" stroke="#ef4444" stroke-width="2"/>
+                        <line x1="200" y1="45" x2="200" y2="89" stroke="#ef4444" stroke-width="2"/>
+                        <line x1="138" y1="45" x2="150" y2="45" stroke="#334155" stroke-width="2"/>
+                        <line x1="138" y1="89" x2="150" y2="89" stroke="#334155" stroke-width="2"/>
+                        <line x1="138" y1="45" x2="138" y2="89" stroke="#334155" stroke-width="2"/>
+                    </svg>
+                    <figcaption id="dia3" class="text-xs text-slate-500 mt-3 leading-relaxed">সিরিজ সংযোগে ভোল্টেজ বাড়ে, প্যারালাল সংযোগে কারেন্ট (অ্যাম্পিয়ার) বাড়ে — সিস্টেম ভোল্টেজ অনুযায়ী বেছে নিন।</figcaption>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <!-- Shared footer -->
+    <footer class="site-footer">
+        <div class="site-footer__links">
+            <a href="https://tools.sukkarshop.com/" target="_blank" rel="noopener">🛠️ Tools</a>
+            <span class="site-footer__sep">|</span>
+            <a href="https://sukkarshop.com" target="_blank" rel="noopener">🏠 Homepage</a>
+        </div>
+        <p class="site-footer__meta">
+            <strong>Solar Power Assistant</strong> · Powered by
+            <a href="https://sukkarshop.com" target="_blank" rel="noopener">sukkarshop.com</a>
+        </p>
+        <p id="footerNote" class="site-footer__note">নিচের লিংকগুলো তৃতীয় পক্ষের সাইটে নিয়ে যাবে — আপনার নিজস্ব রিসোর্স দিয়ে সহজেই পরিবর্তন করা যায়।</p>
+    </footer>
+
+    <script>
+        // External resource links. Swap these for your own curated articles/videos any time.
+        const articles = [
+            { url: "https://en.wikipedia.org/wiki/Solar_panel", icon: "📄",
+              titleBn: "সোলার প্যানেল কীভাবে কাজ করে", titleEn: "How Solar Panels Work",
+              descBn: "ফটোভোলটাইক প্যানেলের মূল নীতি ও প্রকারভেদ।", descEn: "Basics of photovoltaic panels and their types." },
+            { url: "https://en.wikipedia.org/wiki/Photovoltaic_system", icon: "🏠",
+              titleBn: "পূর্ণাঙ্গ সোলার সিস্টেম", titleEn: "Complete PV System",
+              descBn: "প্যানেল, ইনভার্টার, ব্যাটারি ও বাকি উপাদান।", descEn: "Panels, inverter, battery and other components." },
+            { url: "https://en.wikipedia.org/wiki/Solar_inverter", icon: "🔌",
+              titleBn: "ইনভার্টার গাইড", titleEn: "Inverter Guide",
+              descBn: "DC থেকে AC রূপান্তর ও ইনভার্টার সাইজিং।", descEn: "DC-to-AC conversion and inverter sizing." },
+            { url: "https://www.energy.gov/eere/solar/homeowners-guide-going-solar", icon: "✅",
+              titleBn: "ঘরে সোলার লাগানোর গাইড", titleEn: "Homeowner's Guide to Solar",
+              descBn: "প্রথমবার সোলার লাগানোর আগে যা জানা দরকার।", descEn: "What to know before going solar (US DOE)." }
+        ];
+
+        // YouTube search links always resolve — replace with specific videos if you prefer.
+        const videos = [
+            { url: "https://www.youtube.com/results?search_query=solar+panel+system+explained+for+beginners",
+              titleBn: "শুরু করার জন্য বেসিক", titleEn: "Solar Basics for Beginners" },
+            { url: "https://www.youtube.com/results?search_query=how+to+size+solar+system+battery+inverter",
+              titleBn: "সিস্টেম সাইজিং", titleEn: "Sizing Your System" },
+            { url: "https://www.youtube.com/results?search_query=solar+panel+tilt+angle+orientation",
+              titleBn: "প্যানেলের কোণ ও দিক", titleEn: "Panel Tilt & Direction" },
+            { url: "https://www.youtube.com/results?search_query=solar+panel+series+vs+parallel+wiring",
+              titleBn: "সিরিজ বনাম প্যারালাল", titleEn: "Series vs Parallel Wiring" },
+            { url: "https://www.youtube.com/results?search_query=off+grid+solar+installation+step+by+step",
+              titleBn: "অফ-গ্রিড ইনস্টলেশন", titleEn: "Off-Grid Installation" },
+            { url: "https://www.youtube.com/results?search_query=solar+battery+maintenance+tips",
+              titleBn: "ব্যাটারি রক্ষণাবেক্ষণ", titleEn: "Battery Maintenance" }
+        ];
+
+        const dict = {
+            bn: {
+                mainTitle: "সোলার শিখুন ☀️",
+                subTitle: "সোলার প্যানেল, সিস্টেম ডিজাইন ও ইনস্টলেশন বোঝার জন্য বাছাই করা আর্টিকেল, ভিডিও গাইড ও সহায়ক ডায়াগ্রাম।",
+                lblArticles: "📚 আর্টিকেল ও গাইড", lblVideos: "🎬 ভিডিও গাইড", lblDiagrams: "🖼️ সহায়ক ডায়াগ্রাম",
+                dia1: "প্যানেলের কোণ (tilt) সাধারণত আপনার অক্ষাংশের সমান রাখলে সারা বছর গড়ে সবচেয়ে বেশি সূর্যালোক পাওয়া যায়।",
+                dia2: "অফ-গ্রিড সিস্টেমের প্রবাহ: প্যানেল → চার্জ কন্ট্রোলার → ব্যাটারি → ইনভার্টার → লোড (যন্ত্রপাতি)।",
+                dia3: "সিরিজ সংযোগে ভোল্টেজ বাড়ে, প্যারালাল সংযোগে কারেন্ট (অ্যাম্পিয়ার) বাড়ে — সিস্টেম ভোল্টেজ অনুযায়ী বেছে নিন।",
+                footerNote: "নিচের লিংকগুলো তৃতীয় পক্ষের সাইটে নিয়ে যাবে — আপনার নিজস্ব রিসোর্স দিয়ে সহজেই পরিবর্তন করা যায়।",
+                read: "পড়ুন →", watch: "ভিডিও দেখুন →"
+            },
+            en: {
+                mainTitle: "Learn Solar ☀️",
+                subTitle: "Curated articles, video guides, and helpful diagrams to understand solar panels, system design, and installation.",
+                lblArticles: "📚 Articles & Guides", lblVideos: "🎬 Video Guides", lblDiagrams: "🖼️ Helpful Diagrams",
+                dia1: "Keeping the panel tilt roughly equal to your latitude gives the best year-round average sunlight.",
+                dia2: "Off-grid system flow: Panel → Charge Controller → Battery → Inverter → Load (appliances).",
+                dia3: "Series wiring raises voltage; parallel wiring raises current (amps) — choose based on your system voltage.",
+                footerNote: "These links open third-party sites — swap them for your own curated resources any time.",
+                read: "Read →", watch: "Watch →"
+            }
+        };
+
+        const el = (id) => document.getElementById(id);
+        let lang = 'bn';
+
+        function renderLists() {
+            const d = dict[lang];
+            el('articleGrid').innerHTML = articles.map(a => `
+                <a href="${a.url}" target="_blank" rel="noopener" class="res-card bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex gap-4 items-start">
+                    <span class="text-2xl">${a.icon}</span>
+                    <span class="flex-1">
+                        <span class="block font-semibold text-slate-800">${lang === 'bn' ? a.titleBn : a.titleEn}</span>
+                        <span class="block text-sm text-slate-500 mt-1">${lang === 'bn' ? a.descBn : a.descEn}</span>
+                        <span class="block text-sm font-semibold text-blue-600 mt-2">${d.read}</span>
+                    </span>
+                </a>`).join('');
+
+            el('videoGrid').innerHTML = videos.map(v => `
+                <a href="${v.url}" target="_blank" rel="noopener" class="res-card bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col">
+                    <span class="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center text-xl mb-3">▶️</span>
+                    <span class="font-semibold text-slate-800 flex-grow">${lang === 'bn' ? v.titleBn : v.titleEn}</span>
+                    <span class="text-sm font-semibold text-red-600 mt-2">${d.watch}</span>
+                </a>`).join('');
+        }
+
+        function setLang(l) {
+            lang = l;
+            el('langBn').className = `lang-btn ${l === 'bn' ? 'active' : ''}`;
+            el('langEn').className = `lang-btn ${l === 'en' ? 'active' : ''}`;
+            const d = dict[l];
+            ['mainTitle','subTitle','lblArticles','lblVideos','lblDiagrams','dia1','dia2','dia3','footerNote']
+                .forEach(k => { if (el(k)) el(k).innerText = d[k]; });
+            document.documentElement.lang = l === 'bn' ? 'bn' : 'en';
+            localStorage.setItem('solarHubLang', l);
+            renderLists();
+        }
+
+        el('langBn').onclick = () => setLang('bn');
+        el('langEn').onclick = () => setLang('en');
+        setLang(localStorage.getItem('solarHubLang') || 'bn');
+    </script>
+</body>
+</html>
