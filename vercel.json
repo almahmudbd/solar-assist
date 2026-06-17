@@ -1,0 +1,8 @@
+{
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/fb",         "destination": "https://www.facebook.com/sukkar.shop",        "permanent": false },
+    { "source": "/page",       "destination": "https://www.facebook.com/almahmud1234",        "permanent": false },
+    { "source": "/anon",       "destination": "https://docs.google.com/forms/d/e/1FAIpQLSe8QE1-3CKVpvqtFWaCvzTDSS43Mt8B15HGCQQ_Sv2g-1tH9w/viewform", "permanent": false }
+  ]
+}
